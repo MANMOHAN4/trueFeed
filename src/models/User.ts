@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document, mongo } from "mongoose";
 
+// Message Interface
 export interface Message extends Document {
   content: string;
   createdAt: Date;
 }
 
+// Message Schema
 const MessageSchema: Schema<Message> = new Schema({
   content: {
     type: String,
@@ -17,6 +19,7 @@ const MessageSchema: Schema<Message> = new Schema({
   },
 });
 
+// User Interface
 export interface User extends Document {
   username: string;
   email: string;
@@ -28,6 +31,7 @@ export interface User extends Document {
   messages: Message[];
 }
 
+// User Schema
 const UserSchema: Schema<User> = new Schema({
   username: {
     type: String,
