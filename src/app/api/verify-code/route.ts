@@ -1,17 +1,50 @@
-import { success } from "zod";
 import dbConnect from "../../../lib/dbConnect";
 import UserModel from "../../../models/User";
+import { verifySchema } from "../../../schemas/verifySchema";
 
 export async function POST(request: Request) {
   await dbConnect();
 
   try {
-    const { username, code } = await request.json();
-
+    const body = await request.json();
     // Optionally decode username if it came from URL encoding
-    const decodedUsername = decodeURIComponent(username);
+    const preprocessed = {
+      ...body,
+      username: decodeURIComponent(body.username ?? ""),
+    };
 
-    const user = await UserModel.findOne({ username: decodedUsername });
+    const parsed = verifySchema.safeParse(body);
+
+    if (!parsed.success) {
+      // Collect username and code errors separately
+      let usernameError: string[] = [];
+      let codeError: string[] = [];
+
+      for (const iss of parsed.error.issues) {
+        const path = iss.path.join(".");
+        if (path === "username") {
+          usernameError.push(iss.message);
+        } else if (path === "code") {
+          codeError.push(iss.message);
+        }
+      }
+
+      const all = [...usernameError, ...codeError];
+      return Response.json(
+        {
+          success: false,
+          message: all.length ? all.join(", ") : "Invalid input",
+          usernameError,
+          codeError,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Use transformed values from Zod
+    const { username, code } = parsed.data;
+
+    const user = await UserModel.findOne({ username });
 
     if (!user) {
       return Response.json(
