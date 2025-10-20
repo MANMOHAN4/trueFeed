@@ -19,11 +19,14 @@ export async function GET(request: Request) {
     };
 
     // Validate using Zod (safeParse => success/data/error)
-    const result = UsernameQuerySchema.safeParse(queryParam);
+    const parsed = UsernameQuerySchema.safeParse(queryParam);
 
-    if (!result.success) {
+    if (!parsed.success) {
       // Format field errors; show username-specific messages or a generic fallback
-      const usernameErrors = result.error.format().username?._errors || [];
+      const usernameErrors = parsed.error.issues
+        .filter((i) => i.path[0] === "username")
+        .map((i) => i.message);
+
       return Response.json(
         {
           success: false,
@@ -36,7 +39,7 @@ export async function GET(request: Request) {
       );
     }
     // Parsed value is guaranteed by Zod when success === true
-    const { username } = result.data;
+    const { username } = parsed.data;
 
     // Business rule: Treat a username as taken only if a VERIFIED user holds it
     const existingVerifiedUser = await UserModel.findOne({
