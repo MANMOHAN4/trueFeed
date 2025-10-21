@@ -15,11 +15,13 @@ export async function GET(request: Request) {
     // Extract query param (?username=...)
     const { searchParams } = new URL(request.url);
     const queryParam = {
-      username: searchParams.get("usernmae"),
+      username: searchParams.get("username"),
     };
 
     // Validate using Zod (safeParse => success/data/error)
     const parsed = UsernameQuerySchema.safeParse(queryParam);
+
+    // console.log(parsed.data);
 
     if (!parsed.success) {
       // Format field errors; show username-specific messages or a generic fallback
