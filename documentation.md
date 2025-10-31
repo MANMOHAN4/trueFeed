@@ -246,7 +246,7 @@ const MessageSchema: Schema<Message> = new Schema({
 - `extends Document` - This makes it a Mongoose document
 - `Schema<Message>` - TypeScript generic to ensure type safety
 - `type: String` - Note: Mongoose uses capital S in String
-- `type: string` - TypeScript uses lowercase s in string (don't confuse!)
+- `type: string` - TypeScript(interface) uses lowercase s in string (don't confuse!)
 
 ### User Model
 
@@ -969,13 +969,13 @@ OPENAI_API_KEY=your_openai_api_key_here
 **Professor's explanation**: "Resend is one of the latest and most popular email services. It's much easier than traditional services and has a great UI."
 
 ```bash
-npm install resend
-npm install react-email @react-email/components
+npm i resend
+npm i react-email
 ```
 
 ### Email Template
 
-**File**: `src/emails/VerificationEmail.tsx`
+**File**: `emails/VerificationEmail.tsx`
 
 ```typescript
 import {
